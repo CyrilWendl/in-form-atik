@@ -1,0 +1,75 @@
+---
+title: "Naehrwertdaten"
+output: html_document
+date: "2024-09-03"
+---
+
+# Einlesen einer Excel-Datei
+
+Excel-Dateien können mit dem Befehl `readxl::read_excel(...)` eingelesen werden. Dabei können verschiedene Optionen gesetzt werden, wie z.B.
+- `skip = [zahl]`: wie viele Zeilen sollen überprungen werden sollen (z.B. aufgrund von Meta-Informationen)
+- `na c("-", "leer", "...")`: Welche Zeichenketten stehen für leere Werte?
+Wie immer kann die gesamte Dokumentation mit allen Optionen aufgerufen werden, indem Sie auf den Namen einer Funktion klicken und auf Ihrer Tastatur `F1` tippen.
+
+```{r setup, include=FALSE}
+df <- readxl::read_excel("Schweizer_Nahrwertdatenbank.xlsx", skip = 2, na = c("Sp."))
+```
+
+Wir erhalten einige Warnungen (aber keine Fehlermeldugen), da mehrere Kolonnen im Excel-File gleich hiessen und daher zur eindeutigen Erkennbarkeit umbenannt wurden.
+# Datenreinigungs-Phase
+Wie so häufig müssen die Daten zuerst aufgeräumt und bereinigt werden. Ein erster Schritt der Komplexitäts-Reduktion besteht darin, die Kolonnen auszuwählen, die uns interessieren. Mit `names` können wir die Namen aller verfügbaren Kolonnen anzeigen lassen. Alternativ können wir auch auf die Variable `df` in Environment-Kasten (oben rechts) klicken.
+
+```{r}
+names(df)
+```
+
+Wir können nun die Kolonnen, die uns interessieren mittels `select` auswählen. Danach wollen wir die Kolonnennamen auch gleich vereinfachen und benennen sie daher mit der Funktion `rename` um. 
+```{r}
+df <- df %>%
+  # Kolonnen, die uns interessieren auswählen
+  select(ID, Name, Bezugseinheit, matches("kcal|Fett, total|Protein|Kohlenhydrate")) %>%
+  # "Säubern" von Kolonnen-Namen
+  rename("Protein" = "Protein (g)",
+         "Fett" = "Fett, total (g)",
+         "Kohlenhydrate" = "Kohlenhydrate, verfügbar (g)",
+         "Kalorien" = "Energie, Kalorien (kcal)")
+
+head(df)
+```
+Unterhalb des Kolonnennamens sehen wir nun auch den Kolonnentyp. `Kalorien` und `Kohlenhydrate` wurde korrekt als zahl (`<dbl>` = "double", also Kommazahl) eingelesen, `Fett` allerdings nicht. Um zu verstehen, weshalb dies so ist, schauen wir uns die Werte von `Fett` mal an:
+
+```{r}
+df$Fett %>%
+  unique
+```
+Wir erkennen einige Werte, die ein kleiner-als-Zeichen enthalten. Aufgrund dieser Werte dachte `R`, es handle sich um Zeichenketten. Wir müssen diese Werte also durch 0 ersetzen und danach die Kolonne zum Typ "Zahl" umwandeln.
+
+```{r}
+df <- df %>%
+  mutate(across(c("Fett", "Protein"), ~ifelse(grepl("<|NA", .), 0, as.numeric(.))))
+
+df
+```
+
+# Erste Analysen
+Milch und Haferflocken suchen...
+```{r}
+df %>%
+  filter(grepl("Milch",Name))
+```
+
+Neue Kolonne erstellen: Wie viel habe ich gegessen?
+```{r}
+df %>%
+  filter(Name %in% c("Haferflocken", "Milch (Durchschnitt)")) %>%
+  mutate("Menge" = 
+           if_else(Name=="Haferflocken", 120, 0) %>%
+           if_else(Name=="Milch (Durchschnitt)", 140, .)) %>%
+  mutate(across(
+    c("Kohlenhydrate", "Fett", "Protein"), 
+    ~ . * Menge/100,
+    .names = "{.col}_scaled"
+  )) %>%
+  summarise_if(is.numeric, ~sum(.))
+
+```
