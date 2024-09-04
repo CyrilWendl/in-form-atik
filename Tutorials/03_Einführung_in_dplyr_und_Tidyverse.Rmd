@@ -1,0 +1,131 @@
+---
+title: "Einführung in dplyr und Tidyverse"
+output: html_document
+---
+
+## Einführung in dplyr und die Tidyverse
+
+In dieser Lektion lernen Sie, wie Sie mit `dplyr` Daten aufbereiten und manipulieren kénnen.
+
+### Daten mit dplyr laden und bearbeiten
+
+Wir verwenden in dieser Lektion das Paket `dplyr` aus der Tidyverse. Installieren Sie es mit folgendem Befehl, falls Sie es noch nicht haben:
+
+```{r}
+install.packages("dplyr")
+library(dplyr)
+```
+
+### CSV-Format
+
+Eines der verbreitetsten Formate, um Daten abzuspeichern, ist das Format `.csv`. Im Grunde genommen handelt es sich hierbei um nichts anderes als Text, in dem die Daten durch Kommata getrennt sind (CSV = "Comma Separated Values"). Ein Beispiel könnte so aussehen:
+
+```
+Name,Alter,Stadt 
+Anna,23,Zürich 
+Max,29,Bern 
+Lina,31,Basel
+```
+
+Dieses Format enthält typischerweise Daten in Tabellenform, wobei jede Zeile eine neue Datenreihe darstellt, und die Spalten durch Kommas voneinander getrennt sind. Die erste Zeile enthält meist die Spaltennamen, wie im obigen Beispiel `Name`, `Alter` und `Stadt`.
+
+#### CSV-Dateien in R einlesen
+
+Um CSV-Dateien in R zu verwenden, kannst du die Funktion `read.csv()` nutzen. Hier ist ein einfaches Beispiel:
+
+```{r eval=FALSE, include=TRUE}
+# CSV-Datei einlesen
+daten <- read.csv("pfad/zur/datei.csv")
+
+# Die ersten Zeilen der Daten anzeigen
+head(daten)
+```
+
+### Grundlegende Operationen
+
+#### Daten filtern
+```{r}
+# Lade die Schweizer Arbeitslosendaten
+arbeitslosigkeit <- read.csv("SwissUnemployment.csv")
+
+# Zeige nur die Daten für den Kanton Zürich
+arbeitslosigkeit_zürich <- filter(arbeitslosigkeit, Kanton == "Zürich")
+arbeitslosigkeit_zürich
+```
+
+#### Spalten auswählen
+```{r}
+# Wähle nur die Spalten für Jahr und Arbeitslosenquote aus
+auswahl <- select(arbeitslosigkeit, Jahr, Arbeitslosenquote)
+head(auswahl)
+```
+
+### Pipelines (`%>%`)
+Noch viel praktischer und lesbarer wird der Code, wenn wir Pipelines verwenden, da dann das Zwischenspeichern der Resultate entfällt. 
+
+```{r}
+# Wähle nur die Spalten für Jahr und Arbeitslosenquote aus
+arbeitslosigkeit %>%
+  select(Jahr, Arbeitslosenquote) %>%
+  head()
+```
+
+### Was ist eine Pipeline?
+
+Eine **Pipeline** ist ein Konzept, das in der Datenanalyse verwendet wird, um mehrere Schritte der Datenverarbeitung miteinander zu verketten. In R wird dies oft durch den sogenannten "Pipe"-Operator `%>%` aus dem `magrittr`-Paket realisiert, der auch Teil des `tidyverse` ist. Mit diesem Operator können die Ausgaben eines Befehls direkt als Eingabe für den nächsten Befehl verwendet werden, wodurch der Code lesbarer und klarer strukturiert wird.
+
+#### Beispiel:
+Angenommen, du hast einen Datensatz `städte_daten`, der die Bevölkerung und das Durchschnittsalter in verschiedenen Schweizer Städten enthält:
+
+```{r}
+# Beispiel-Datensatz
+städte_daten <- data.frame(
+  Stadt = c("Zürich", "Bern", "Genf", "Basel", "Luzern"),
+  Bevölkerung = c(415367, 133883, 201818, 178488, 82081),
+  Durchschnittsalter = c(42.6, 43.2, 41.1, 43.5, 41.8)
+)
+```
+
+Wenn man nun Städte mit mehr als 150.000 Einwohnern filtern möchte und den Altersdurchschnitt all dieser Städte berechnen möchte, könnte man Folgendes schreiben (unschön):
+
+```{r}
+summarize(filter(städte_daten, Bevölkerung>150000), Mittelwert_Alter=mean(Durchschnittsalter))
+```
+
+Stattdessen ist es viel leserlicher, eine Pipeline mit dem `%>%`-Operator zu verwenden:
+
+```{r}
+städte_daten %>%
+  filter(Bevölkerung > 150000) %>%
+  summarize(Mittelwert_Alter = mean(Durchschnittsalter))
+```
+Wenn Sie die obigen Beispiele genau vergleichen, erkennen Sie, dass das Resultat jeder Zeile "unsichtbar" als erstes Argument an die nächste Funktion (auf der nächsten Zeile) weitergegeben wird.
+
+Wir könnten das Ergebnis der letzten drei Zeilen natürlich auch in einer Variable speichern, um diese später weiterzuverwenden. Dies ist aber nicht nötig.
+
+```{r}
+# Pipeline-Beispiel: Filtere Städte mit mehr als 150.000 Einwohnern und berechne den Durchschnitt des Alters
+ergebnis <- städte_daten %>%
+  filter(Bevölkerung > 150000) %>%
+  summarize(Mittelwert_Alter = mean(Durchschnittsalter))
+
+ergebnis
+```
+
+In dieser Form ist die Logik der Datenverarbeitung einfacher zu verstehen, da die Schritte klar nacheinander ausgeführt werden.
+
+#### Daten sortieren
+```{r}
+# Sortiere die Daten nach Jahr in absteigender Reihenfolge
+sortiert <- arbeitslosigkeit %>%
+  arrange(desc(Jahr))
+head(sortiert)
+```
+
+### Übung:
+1. Filtern Sie die Arbeitslosendaten für den Kanton Bern.
+2. Wählen Sie nur die Spalten "Arbeitslosenquote" und "Jahr" aus.
+3. Sortieren Sie die Daten nach der Arbeitslosenquote in aufsteigender Reihenfolge.
+
+### Herausforderung:
+Verwende eine Kombination aus `filter()`, `mutate()` und `summarize()`, um die durchschnittliche Arbeitslosenquote in der Schweiz für verschiedene Altersgruppen zu berechnen. Zeige dies mit einem `ggplot2`-Diagramm.

@@ -1,0 +1,33 @@
+---
+title: "Datenvisualisierung mit ggplot2"
+output: html_document
+---
+
+## Datenvisualisierung mit ggplot2
+
+In dieser Lektion wirst du lernen, wie du mit `ggplot2` aus der Tidyverse Daten visualisieren kannst.
+
+### Einführung in ggplot2
+
+Das `ggplot2`-Paket ist eines der beliebtesten Pakete für die Erstellung von Grafiken in R.
+
+### Ein einfaches Beispiel
+```{r}
+# Lade die Lebensdaten der Schweiz
+lebenserwartung <- read.csv("SwissLifeExpectancy.csv")
+
+# Erstelle ein einfaches Streudiagramm mit ggplot2
+library(ggplot2)
+ggplot(lebenserwartung, aes(x=Jahr, y=Lebenserwartung)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  ggtitle("Lebenserwartung in der Schweiz über die Jahre")
+```
+
+### Übung:
+1. Erstelle ein Balkendiagramm, das die Arbeitslosenquote in verschiedenen Schweizer Kantonen zeigt.
+2. Erstelle ein Liniendiagramm, das die Entwicklung der Lebenserwartung in der Schweiz über die Jahre zeigt.
+
+### Herausforderung:
+Verwende die Arbeitslosendaten, um ein `ggplot2`-Diagramm zu erstellen, das die Arbeitslosenquote in der Schweiz über verschiedene Altersgruppen und Kantone hinweg vergleicht.
+

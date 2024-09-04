@@ -1,0 +1,106 @@
+---
+title: "Einführung in R"
+output: html_document
+---
+
+## Einführung in R
+
+In dieser Lektion lernen Sie die Grundlagen der Programmierung mit der Sprache `R`. Weshalb noch eine weitere Programmiersprache? `R` wird sehr häufig in der Finanzindustrie und in der Statistik verwendet, um Daten schnell und einfach zu analysieren und zu verarbeiten. Bevor wir uns mit Datenanalyse befassen, sollten wir jedoch zuerst die  grundlegende Syntax, Datentypen und den Umgang mit Daten in R kennenlernen.
+
+### Erste Schritte mit R
+
+Für diese Tutorials verwenden wir die Webseite `in-form-atik.ch:8787`. Speichern Sie diese, sowie Ihren Benutzernamen und Ihr Passwort, an einem sicheren Ort auf Ihrem Computer ab.
+
+Für diese Tutorials verwenden wir `R Markdown` (`.Rmd`-Dateien). Einige Vorteile dieser Skripte sind:
+- Sowohl Code und Erklärtexte können gleichzeitig in separaten Blocks erstellt und angezeigt werden.
+- Resultate werden direkt unterhalb von jedem Code-Block angezeigt
+- Die `.Rmd`-Dateien können in (fast) beliebige Formate exportiert werden (PDF, HTML-Webseite, Word, Powerpoint etc.)
+
+Jeder Code-Block beginnt mit drei Backticks (```) und endet mit drei Backticks. Dazu muss zu beginn noch die Programmiersprache angegeben werden (auch Python ist möglich!). Jeder Code-Block kann mit dem kleinen "Play"-Pfeil oben rechts des Code-Blocks ausgeführt werden.
+
+#### 1. Grundlegende mathematische Operationen in R
+```{r}
+# Addition
+2 + 2
+
+# Multiplikation
+3 * 4
+
+# Division
+10 / 2
+```
+
+Ein Befehl wie `print`, den es in Python braucht, muss nicht angegeben werden. Solange nur Werte berechnet, nicht aber abgespeichert werden, werden diese automatisch unterhalb des Code-Blocks ausgegeben.
+
+#### 2. Variablen in R
+
+Variablen in R werden mit den Zeichen `<-` gespeichert (in Python würden Sie dafür das `=`-Zeichen verwenden). Falls es Sie interessiert, weshalb dies so ist, finden Sie [hier](https://graebnerc.github.io/RforSocioEcon/basics.html#es:befehle) weitere Erklärungen dazu.
+
+```{r}
+x <- 5
+y <- 10
+x + y
+```
+
+### Arbeiten mit Vektoren
+
+Vektoren erlauben es, mehrere Werte in einer Variable abzuspeichern. Sie sind insofern vergleichbar mit Listen in Python.
+
+```{r}
+# Erstelle einen Vektor mit den ersten fünf Primzahlen
+primzahlen <- c(2, 3, 5, 7, 11)
+primzahlen
+```
+
+
+### Schleifen in `R`
+Schleifen können in `R` wie folgt erstellt werden:
+
+```{r}
+# berechne die Summe der ersten 5 Primzahlen
+summe <- 0
+for (primzahl in primzahlen) {
+  summe <- summe + primzahl
+}
+summe
+```
+
+### Verzeigungen
+
+```{r}
+# Beispiel für eine einfache Bedingung
+punktzahl <- 85
+
+if (punktzahl >= 90) {
+  ergebnis <- "Sehr gut"
+} else if (punktzahl >= 75) {
+  ergebnis <- "Gut"
+} else {
+  ergebnis <- "Verbesserung nötig"
+}
+
+print(ergebnis)
+```
+
+### Definitionen
+
+```{r}
+# Definiere eine Funktion, die zwei Zahlen addiert
+addiere_zahlen <- function(a, b) {
+  summe <- a + b
+  return(summe)
+}
+
+# Verwende die Funktion
+ergebnis <- addiere_zahlen(5, 10)
+print(ergebnis)
+```
+
+
+### Übung:
+1. Erstelle einen Vektor mit den Namen der 5 größten Städte der Schweiz und gib ihn aus.
+2. Berechne den Durchschnitt von fünf beliebigen Zahlen in einem Vektor. 
+
+### Herausforderung:
+Verwende den Leistungsdatensatz (`SwissStudentPerformance.csv`), um den Durchschnitt und Median der Mathematiknoten von Schülern aus verschiedenen Regionen der Schweiz zu berechnen.
+

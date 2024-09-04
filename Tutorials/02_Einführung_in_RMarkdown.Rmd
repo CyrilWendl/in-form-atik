@@ -1,0 +1,40 @@
+---
+title: "Einführung in R Markdown"
+output: html_document
+---
+
+## Einführung in R Markdown
+
+In dieser Lektion lernen Sie, wie Sie Ihre Daten-Analyse mit R Markdown dokumentieren können.
+
+### Was ist R Markdown?
+
+R Markdown ist ein nützliches Werkzeug, mit dem Sie Code, Text und Grafiken in einem einzigen Dokument zusammenführen können Dies macht es ideal für Berichte, wissenschaftliche Arbeiten und Dokumentationen.
+
+### Struktur eines R Markdown Dokuments
+
+Ein R-Markdown-Dokument besteht aus:
+- **Header** (wie der Titel und die Ausgabeoptionen oben),
+- **Text**, 
+- **Code-Chunks**.
+
+### Einfache Beispiele
+
+#### Text hinzufügen
+Sie können einen normalen Text wie diesen schreiben.
+
+#### R Code einfügen
+```{r}
+# Ein einfaches Diagramm mit den Einwohnerzahlen von Schweizer Kantonen
+kanton <- c("Zürich", "Bern", "Luzern", "Genf", "Basel")
+bevölkerung <- c(1530000, 1030000, 407000, 501000, 178000)
+barplot(bevölkerung, names.arg=kanton, col="lightblue", main="Einwohnerzahlen der Kantone")
+```
+
+### Übung:
+1. Erstellen Sie einfaches R Markdown-Dokument, das drei interessante Fakten über die Schweiz enthält.
+2. Fügen ein Diagramm hinzu, das die Bevölkerungsverteilung in den Schweizer Kantonen zeigt.
+
+### Herausforderung:
+Erstellen Sie ein R-Markdown-Dokument, das die Wachstumsrate der Bevölkerung in den Kantonen über die letzten 10 Jahre zeigt. Integrieren Sie einen Plot und fügen Sie eine kurze Analyse als Text bei.
+
