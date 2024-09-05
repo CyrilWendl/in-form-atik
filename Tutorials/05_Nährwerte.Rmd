@@ -1,7 +1,12 @@
 ---
-title: "Naehrwertdaten"
-output: html_document
-date: "2024-09-03"
+title: "Analyse von Nährwertdaten"
+author: "Cyril Wendl"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
 ---
 
 # Einlesen einer Excel-Datei
@@ -12,21 +17,32 @@ Excel-Dateien können mit dem Befehl `readxl::read_excel(...)` eingelesen werden
 Wie immer kann die gesamte Dokumentation mit allen Optionen aufgerufen werden, indem Sie auf den Namen einer Funktion klicken und auf Ihrer Tastatur `F1` tippen.
 
 ```{r setup, include=FALSE}
+library("dplyr")
+```
+
+```{r read-excel}
 df <- readxl::read_excel("Schweizer_Nahrwertdatenbank.xlsx", skip = 2, na = c("Sp."))
 ```
 
-Wir erhalten einige Warnungen (aber keine Fehlermeldugen), da mehrere Kolonnen im Excel-File gleich hiessen und daher zur eindeutigen Erkennbarkeit umbenannt wurden.
-# Datenreinigungs-Phase
+Wir erhalten einige Mitteilungen (aber keine Fehlermeldugen), da mehrere Kolonnen im Excel-File gleich hiessen und daher zur eindeutigen Erkennbarkeit umbenannt wurden. Falls wir keine Mitteilungen sehen möchten, könenn wir den Befehl `suppressMessages(...)` verwenden:
+
+```{r eval=FALSE}
+df <- suppressMessages(readxl::read_excel("Schweizer_Nahrwertdatenbank.xlsx", skip = 2, na = c("Sp.")))
+```
+
+# Datenbereinigung
+
 Wie so häufig müssen die Daten zuerst aufgeräumt und bereinigt werden. Ein erster Schritt der Komplexitäts-Reduktion besteht darin, die Kolonnen auszuwählen, die uns interessieren. Mit `names` können wir die Namen aller verfügbaren Kolonnen anzeigen lassen. Alternativ können wir auch auf die Variable `df` in Environment-Kasten (oben rechts) klicken.
 
 ```{r}
 names(df)
 ```
 
-Wir können nun die Kolonnen, die uns interessieren mittels `select` auswählen. Danach wollen wir die Kolonnennamen auch gleich vereinfachen und benennen sie daher mit der Funktion `rename` um. 
+Wir können nun die Kolonnen, die uns interessieren mittels `select` auswählen. Danach wollen wir die Kolonnennamen auch gleich vereinfachen und benennen sie daher mit der Funktion `rename` um.
+
 ```{r}
 df <- df %>%
-  # Kolonnen, die uns interessieren auswählen
+  # Kolonnen, die uns interessieren, auswählen
   select(ID, Name, Bezugseinheit, matches("kcal|Fett, total|Protein|Kohlenhydrate")) %>%
   # "Säubern" von Kolonnen-Namen
   rename("Protein" = "Protein (g)",
@@ -36,40 +52,172 @@ df <- df %>%
 
 head(df)
 ```
+
+Mit der Funktion `matches(...)` können wir innerhalb von `select(...)` Kolonnen auswählen, ohne deren ganzen Namen einzugeben. Dazu wird innerhalb Funktion `matches(...)` ein *regulärer Ausdruck* verwendet (englisch **regular expression**). Das obige Beispiel bedeutet, dass der Kolonnenname entweder den Text "kcal", "Fett, total", "Protein" oder "Kohlenhydrate" enthält. Weitere Informationen zu regulären Ausdrücken finden Sie [hier](https://stringr.tidyverse.org/articles/regular-expressions.html).
+
 Unterhalb des Kolonnennamens sehen wir nun auch den Kolonnentyp. `Kalorien` und `Kohlenhydrate` wurde korrekt als zahl (`<dbl>` = "double", also Kommazahl) eingelesen, `Fett` allerdings nicht. Um zu verstehen, weshalb dies so ist, schauen wir uns die Werte von `Fett` mal an:
 
 ```{r}
 df$Fett %>%
   unique
 ```
-Wir erkennen einige Werte, die ein kleiner-als-Zeichen enthalten. Aufgrund dieser Werte dachte `R`, es handle sich um Zeichenketten. Wir müssen diese Werte also durch 0 ersetzen und danach die Kolonne zum Typ "Zahl" umwandeln.
+
+Wir erkennen einige Werte, die ein kleiner-als-Zeichen (`<`) enthalten. Aufgrund dieser Werte dachte `R`, es handle sich um Zeichenketten. Wir müssen diese Werte also durch `0` ersetzen und danach die Kolonne zum Typ "Zahl" umwandeln.
 
 ```{r}
 df <- df %>%
-  mutate(across(c("Fett", "Protein"), ~ifelse(grepl("<|NA", .), 0, as.numeric(.))))
+  # Werte, die "<" enhalten durch "0" ersetzen
+  mutate_at(c("Fett", "Protein"), ~ifelse(grepl("<", .), "0", .)) %>%
+  mutate_at(c("Fett", "Protein"), as.numeric)
 
 df
 ```
 
-# Erste Analysen
-Milch und Haferflocken suchen...
+# Visualisierungen
 ```{r}
-df %>%
-  filter(grepl("Milch",Name))
+# 1. Scatterplot: Kalorien vs Kohlenhydrate (nicht interaktiv)
+ggplot2::ggplot(df, ggplot2::aes(x = Kalorien, y = Kohlenhydrate)) +
+  ggplot2::geom_point(color = 'blue') +
+  ggplot2::labs(title = "Kalorien vs Kohlenhydrate",
+       x = "Kalorien (pro 100g)",
+       y = "Kohlenhydrate (pro 100g)") +
+  ggplot2::theme_minimal()
 ```
 
-Neue Kolonne erstellen: Wie viel habe ich gegessen?
 ```{r}
+# 2. Balkendiagramm: Top 10 Lebensmittel mit dem höchsten Proteingehalt (nicht interaktiv)
 df %>%
-  filter(Name %in% c("Haferflocken", "Milch (Durchschnitt)")) %>%
-  mutate("Menge" = 
-           if_else(Name=="Haferflocken", 120, 0) %>%
-           if_else(Name=="Milch (Durchschnitt)", 140, .)) %>%
+  arrange(desc(Protein)) %>%
+  top_n(10, Protein) %>%
+  ggplot2::ggplot(ggplot2::aes(x = reorder(Name, Protein), y = Protein)) +
+  ggplot2::geom_bar(stat = "identity", fill = "green") +
+  ggplot2::coord_flip() +
+  ggplot2::labs(title = "Top 10 Lebensmittel mit dem höchsten Proteingehalt",
+       x = "Lebensmittel",
+       y = "Protein (g pro 100g)") +
+  ggplot2::theme_minimal()
+```
+
+```{r}
+# 3. Interaktiver Scatterplot: Kalorien vs Fett
+plotly::plot_ly(df, x = ~Kalorien, y = ~Fett, type = 'scatter', mode = 'markers',
+        marker = list(size = 10, color = 'red'),
+        text = ~paste("Lebensmittel:", Name, "<br>Kalorien:", Kalorien, "<br>Fett:", Fett)) %>%
+  plotly::layout(title = "Kalorien vs Fett",
+         xaxis = list(title = "Kalorien (pro 100g)"),
+         yaxis = list(title = "Fett (g pro 100g)"))
+```
+
+```{r}
+# 4. Dichteplot: Verteilung von Kalorien (nicht interaktiv)
+ggplot2::ggplot(df, ggplot2::aes(x = Kalorien)) +
+  ggplot2::geom_density(fill = "purple", alpha = 0.6) +
+  ggplot2::labs(title = "Verteilung der Kalorien",
+       x = "Kalorien (pro 100g)",
+       y = "Dichte") +
+  ggplot2::theme_minimal()
+```
+
+```{r}
+# 5. Interaktives Balkendiagramm: Vergleich von Fett- und Kohlenhydratgehalt
+df_top10 <- df %>%
+  arrange(desc(Kohlenhydrate)) %>%
+  top_n(10, Kohlenhydrate)
+
+plotly::plot_ly(df_top10, x = ~Name, y = ~Fett, type = 'bar', name = 'Fett', marker = list(color = 'blue')) %>%
+  plotly::add_trace(y = ~Kohlenhydrate, name = 'Kohlenhydrate', marker = list(color = 'orange')) %>%
+  plotly::layout(title = "Vergleich von Fett und Kohlenhydraten (Top 10 Lebensmittel)",
+         xaxis = list(title = "Lebensmittel"),
+         yaxis = list(title = "Inhalt (g pro 100g)"),
+         barmode = 'group')
+```
+
+```{r}
+# Berechnung des Proteingehalts pro Kalorie
+df$Protein_pro_Kalorie <- df$Protein / df$Kalorien
+
+# Top 10 Lebensmittel mit dem höchsten Proteingehalt pro Kalorie
+df_top_protein_per_calorie <- df %>%
+  arrange(desc(Protein_pro_Kalorie)) %>%
+  top_n(10, Protein_pro_Kalorie)
+
+# Balkendiagramm erstellen
+ggplot2::ggplot(df_top_protein_per_calorie, ggplot2::aes(x = reorder(Name, Protein_pro_Kalorie), y = Protein_pro_Kalorie)) +
+  ggplot2::geom_bar(stat = "identity", fill = "cyan") +
+  ggplot2::coord_flip() +
+  ggplot2::labs(title = "Top 10 Lebensmittel mit dem höchsten Proteingehalt pro Kalorie",
+       x = "Lebensmittel",
+       y = "Protein pro Kalorie") +
+  ggplot2::theme_minimal() +
+  # wrap y axis label
+  ggplot2::scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 40))
+
+```
+
+# Analysen von eigenen Mahlzeiten
+
+Das folgende Beispiel nimmt an, dass wir unser Frühstück mit einer Küchenwaage abgewogen und die Zutaten sowie die Mengen notiert haben. Nun möchten wir gerne die Kalorien (=Energie-Gehalt) sowie die Makro-Nährstoffe (Protein, Fett und Kohlenhydrate) dieser Mahlzeit berechnen und schauen, ob das Frühstück gesund ist oder nicht (mehr zu Gesundheits-Vorgaben später). Zuerst erfassen wir die Zutaten und die Mengen in einer neuen Tabelle, die wir `df_gericht` nennen:
+
+```{r}
+df_gericht <- data.frame(
+  "Zutaten" = c("Hafer", "Milch", "Beeren"),
+  "Menge konsumiert" = c(100, 150, 80),
+  "Einheit" = c("Gramm", "Mililiter", "Gramm")
+)
+
+df_gericht
+```
+Nun möchten wir die passenden Einträge zu jeder Zutat aus unserer Nährwert-Datenbank finden. Dazu müssen wir die Nährwert-Datenbank nach jeder Zutat durchsuchen und die richtige Zutat notieren:
+
+```{r}
+# Unten zuerst Milch, dann Hafer, dann Beeren einsetzen
+df %>%
+  filter(grepl("Hafer",Name))
+```
+Nun sollten wir uns die Namen aus der Nährwert-Datenbank merken, oder noch besser, die ID (erste Kolonne, eindeutige Zahl), um beide Tabellen miteinander verbinden zu können. Wir erstellen dazu einfach eine neue Kolonne in `df_gericht`:
+```{r}
+df_gericht$ID <- c(198,1194,1119)
+df_gericht
+```
+
+
+Nun können wir die beiden Tabellen verbinden und das Resultat in einer neuen Tabelle `df_all` speichern:
+```{r}
+df_all <- merge(df_gericht, df, by="ID")
+df_all
+```
+
+Nun müssen wir noch die effektiv konsumierten Mengen an Kalorien, Fett etc. berechnen, indem wir die Menge pro 100g / 100 ml mit der gegessenen Menge multiplizieren:
+
+```{r}
+df_all <- df_all %>%
   mutate(across(
-    c("Kohlenhydrate", "Fett", "Protein"), 
-    ~ . * Menge/100,
-    .names = "{.col}_scaled"
-  )) %>%
-  summarise_if(is.numeric, ~sum(.))
-
+    c("Kohlenhydrate", "Fett", "Protein","Kalorien"), 
+    # Das Zeichen "~" beginnt eine Funktion, die auf jede Kolonne (".") angewandt wird
+    ~ . * `Menge.konsumiert`/100,
+    # Die neuen Kolonnen haben den gleichen Namen wie die Ursprungskolonnen plus den Zusatz "_konsumiert".
+    .names = "{.col}_konsumiert"
+  ))
 ```
+
+
+Nun können wir berechnen, welche Makro-Nährstoffe unser ganzes Gericht enthält.
+```{r}
+df_all %>%
+  # alle numerischen Kolonnen (=Kolonnen, die Zahlen enthalten) summieren
+  summarise(across(matches("konsumiert"), sum))
+```
+Wir können die Resultate nun auch pro Lebensmittel visualisieren:
+```{r}
+df_all %>%
+  # hier wird es etwas "nasty": die Daten müssen in ein neues Format transformiert werden, damit plotly sie gut visualisieren kann.
+  reshape2::melt(id.vars="Zutaten", measure.vars=c("Kohlenhydrate_konsumiert", "Fett_konsumiert","Protein_konsumiert"),value.name = "Menge", variable.name="Makronährstoff") %>% 
+  # der Text _konsumiert wird auf jeder Zeile gelöscht
+  mutate_at("Makronährstoff", ~gsub("_konsumiert", "", .)) %>%
+  # die Reihenfolge der Bars kann verändert werden, indem die Kolonne zum Typ "geordneter Faktor" abgeändert wird.  
+  mutate_at("Makronährstoff", ~factor(., levels=c("Fett", "Kohlenhydrate", "Protein"), ordered = T)) %>%
+  plotly::plot_ly(x = ~Makronährstoff, y = ~Menge, color=~Zutaten, type = 'bar', hovertemplate = ~paste("Lebensmittel:", Zutaten, "<br>", Makronährstoff, ":", Menge)) %>%
+  plotly::layout(title = "Makronährstoffe pro Zutat", barmode = 'stack', yaxis = list(title = "Menge (g)"))
+```
+
+
