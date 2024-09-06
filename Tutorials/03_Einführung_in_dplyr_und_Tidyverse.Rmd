@@ -1,24 +1,43 @@
 ---
-title: "Einführung in dplyr und Tidyverse"
-output: html_document
+title: "Lektion 03: Einführung in Datenverarbeitung"
+subtitle: "Dplyr, Tidyverse und Pipes"
+author: "Cyril Wendl"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+  learnr::tutorial:
+runtime: shiny_prerendered
 ---
 
-## Einführung in dplyr und die Tidyverse
+```{r setup, include=FALSE}
+library(learnr)
+```
+
+
+# Einführung in dplyr und die Tidyverse
 
 In dieser Lektion lernen Sie, wie Sie mit `dplyr` Daten aufbereiten und manipulieren kénnen.
 
-### Daten mit dplyr laden und bearbeiten
+# Daten mit dplyr laden und bearbeiten
 
 Wir verwenden in dieser Lektion das Paket `dplyr` aus der Tidyverse. Installieren Sie es mit folgendem Befehl, falls Sie es noch nicht haben:
 
-```{r}
+```{r eval=F}
 install.packages("dplyr")
+```
+
+```{r}
 library(dplyr)
 ```
 
-### CSV-Format
+Die obigen Meldungen können vorerst ignoriert werden. Wir werden später, im Kontext vom Präfixierung, wieder darauf zu sprechen kommen.
 
-Eines der verbreitetsten Formate, um Daten abzuspeichern, ist das Format `.csv`. Im Grunde genommen handelt es sich hierbei um nichts anderes als Text, in dem die Daten durch Kommata getrennt sind (CSV = "Comma Separated Values"). Ein Beispiel könnte so aussehen:
+# CSV-Format
+
+Eines der verbreitetsten Formate, um Daten abzuspeichern, ist das Format `.csv`. Im Grunde genommen handelt es sich hierbei lediglich um eine Text-Datei mit der Dateiendung `.csv`, welche eine Tabelle enthält. Jeder Wert einer Zeile ist dabei durch Kommas getrennt sind (CSV = "Comma Separated Values"). Ein Beispiel einer CSV-Datei könnte so aussehen:
 
 ```
 Name,Alter,Stadt 
@@ -27,23 +46,40 @@ Max,29,Bern
 Lina,31,Basel
 ```
 
+Diese Datei haben wir abgespeichert unter `beispiel.csv`. 
+
 Dieses Format enthält typischerweise Daten in Tabellenform, wobei jede Zeile eine neue Datenreihe darstellt, und die Spalten durch Kommas voneinander getrennt sind. Die erste Zeile enthält meist die Spaltennamen, wie im obigen Beispiel `Name`, `Alter` und `Stadt`.
 
 #### CSV-Dateien in R einlesen
 
 Um CSV-Dateien in R zu verwenden, kannst du die Funktion `read.csv()` nutzen. Hier ist ein einfaches Beispiel:
 
-```{r eval=FALSE, include=TRUE}
+```{r}
 # CSV-Datei einlesen
-daten <- read.csv("pfad/zur/datei.csv")
+df <- read.csv("beispiel.csv")
 
 # Die ersten Zeilen der Daten anzeigen
-head(daten)
+head(df)
+```
+Tabellen werden in R als sogenannte "dataframes" gespeichert, daher verwenden wir für die Variablen-Namen häufig die Abkürzung `df`, für "*d*ata*f*rame".
+
+# Grundlegende Operationen
+Im Folgenden wollen wir eine CSV-Datei einlesen, die Daten zur Arbeitlosigkeit in verschiedenen Schweizer Kantonen enthält.
+
+```{r filter, exercise=TRUE}
+# fügen Sie Ihren Code untenan ein.
+# arbeitslosigkeit <- ... 
+```
+```{r filter-hint}
+arbeitslosigkeit <- read.csv("...")
+```
+```{r filter-solution, exercise.reveal_solution = TRUE}
+# Lade die Schweizer Arbeitslosendaten
+arbeitslosigkeit <- read.csv("SwissUnemployment.csv")
 ```
 
-### Grundlegende Operationen
 
-#### Daten filtern
+## Daten filtern
 ```{r}
 # Lade die Schweizer Arbeitslosendaten
 arbeitslosigkeit <- read.csv("SwissUnemployment.csv")
@@ -53,15 +89,15 @@ arbeitslosigkeit_zürich <- filter(arbeitslosigkeit, Kanton == "Zürich")
 arbeitslosigkeit_zürich
 ```
 
-#### Spalten auswählen
+## Spalten auswählen
 ```{r}
 # Wähle nur die Spalten für Jahr und Arbeitslosenquote aus
 auswahl <- select(arbeitslosigkeit, Jahr, Arbeitslosenquote)
 head(auswahl)
 ```
 
-### Pipelines (`%>%`)
-Noch viel praktischer und lesbarer wird der Code, wenn wir Pipelines verwenden, da dann das Zwischenspeichern der Resultate entfällt. 
+# Pipes & Pipelines (`%>%`)
+Noch viel praktischer und lesbarer wird der Code, wenn wir sogenannte *Pipes* verwenden, da dann das Zwischenspeichern der Resultate entfällt. 
 
 ```{r}
 # Wähle nur die Spalten für Jahr und Arbeitslosenquote aus
@@ -70,12 +106,12 @@ arbeitslosigkeit %>%
   head()
 ```
 
-### Was ist eine Pipeline?
+## Was ist eine Pipe(line)?
 
-Eine **Pipeline** ist ein Konzept, das in der Datenanalyse verwendet wird, um mehrere Schritte der Datenverarbeitung miteinander zu verketten. In R wird dies oft durch den sogenannten "Pipe"-Operator `%>%` aus dem `magrittr`-Paket realisiert, der auch Teil des `tidyverse` ist. Mit diesem Operator können die Ausgaben eines Befehls direkt als Eingabe für den nächsten Befehl verwendet werden, wodurch der Code lesbarer und klarer strukturiert wird.
+Eine **Pipeline** ist ein Konzept, das in der Datenanalyse verwendet wird, um mehrere Schritte der Datenverarbeitung miteinander zu verketten. In R wird dies oft durch den sogenannten **Pipe**-Operator `%>%` aus dem ` %>% `-Paket realisiert, der auch Teil des `tidyverse` ist. Mit diesem Operator können die Ausgaben eines Befehls direkt als Eingabe für den nächsten Befehl verwendet werden, wodurch der Code lesbarer und klarer strukturiert wird.
 
-#### Beispiel:
-Angenommen, du hast einen Datensatz `städte_daten`, der die Bevölkerung und das Durchschnittsalter in verschiedenen Schweizer Städten enthält:
+### Beispiel:
+Angenommen, Sie haben einen Datensatz `städte_daten`, der die Bevölkerung und das Durchschnittsalter in verschiedenen Schweizer Städten enthält:
 
 ```{r}
 # Beispiel-Datensatz
@@ -114,7 +150,7 @@ ergebnis
 
 In dieser Form ist die Logik der Datenverarbeitung einfacher zu verstehen, da die Schritte klar nacheinander ausgeführt werden.
 
-#### Daten sortieren
+## Daten sortieren
 ```{r}
 # Sortiere die Daten nach Jahr in absteigender Reihenfolge
 sortiert <- arbeitslosigkeit %>%
@@ -122,10 +158,19 @@ sortiert <- arbeitslosigkeit %>%
 head(sortiert)
 ```
 
-### Übung:
+# Übungen
 1. Filtern Sie die Arbeitslosendaten für den Kanton Bern.
+```{r}
+# Lösung hier einfügen
+```
 2. Wählen Sie nur die Spalten "Arbeitslosenquote" und "Jahr" aus.
+```{r}
+# Lösung hier einfügen
+```
 3. Sortieren Sie die Daten nach der Arbeitslosenquote in aufsteigender Reihenfolge.
+```{r}
+# Lösung hier einfügen
+```
 
-### Herausforderung:
+# Challenge-Übungen
 Verwende eine Kombination aus `filter()`, `mutate()` und `summarize()`, um die durchschnittliche Arbeitslosenquote in der Schweiz für verschiedene Altersgruppen zu berechnen. Zeige dies mit einem `ggplot2`-Diagramm.

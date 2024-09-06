@@ -1,5 +1,5 @@
 ---
-title: "Analyse von Nährwertdaten"
+title: "Lektion 05: Einführung in Datenanalyse"
 author: "Cyril Wendl"
 date: "`r Sys.Date()`"
 output:
@@ -11,14 +11,15 @@ output:
 
 # Einlesen einer Excel-Datei
 
-Excel-Dateien können mit dem Befehl `readxl::read_excel(...)` eingelesen werden. Dabei können verschiedene Optionen gesetzt werden, wie z.B.
-- `skip = [zahl]`: wie viele Zeilen sollen überprungen werden sollen (z.B. aufgrund von Meta-Informationen)
-- `na c("-", "leer", "...")`: Welche Zeichenketten stehen für leere Werte?
-Wie immer kann die gesamte Dokumentation mit allen Optionen aufgerufen werden, indem Sie auf den Namen einer Funktion klicken und auf Ihrer Tastatur `F1` tippen.
-
 ```{r setup, include=FALSE}
 library("dplyr")
 ```
+
+Excel-Dateien können mit dem Befehl `readxl::read_excel(...)` eingelesen werden. Dabei können verschiedene Optionen gesetzt werden, wie z.B.:
+
+- `skip = [zahl]`: wie viele Zeilen sollen überprungen werden sollen (z.B. aufgrund von Meta-Informationen)
+- `na c("-", "leer", "...")`: Welche Zeichenketten stehen für leere Werte?
+Wie immer kann die gesamte Dokumentation mit allen Optionen aufgerufen werden, indem Sie auf den Namen einer Funktion klicken und auf Ihrer Tastatur `F1` tippen.
 
 ```{r read-excel}
 df <- readxl::read_excel("Schweizer_Nahrwertdatenbank.xlsx", skip = 2, na = c("Sp."))

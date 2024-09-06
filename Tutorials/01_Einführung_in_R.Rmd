@@ -7,15 +7,30 @@ output:
     toc: true
     toc_float:
       collapsed: true
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
 ---
 
-# Einführung in `R`
+```{r setup, include=FALSE}
+library(learnr)
+gradethis::gradethis_setup()
+schweizer_staedte <- c("Zürich", "Genf", "Basel", "Lausanne", "Bern")
+```
 
-In dieser Lektion lernen Sie die Grundlagen der Programmierung mit der Sprache `R`. Weshalb noch eine weitere Programmiersprache? `R` wird sehr häufig in der Finanzindustrie und in der Statistik verwendet, um Daten schnell und einfach zu analysieren und zu verarbeiten. Bevor wir uns mit Datenanalyse befassen, sollten wir jedoch zuerst die  grundlegende Syntax, Datentypen und den Umgang mit Daten in R kennenlernen.
+## Einführung in `R`
 
-# Erste Schritte mit `R`
+In dieser Lektion lernen Sie die Grundlagen der Programmierung mit der Sprache `R`. Einige der grossen Vorteile der Programmiersprache `R` sind: 
+- `R` erlaubt es uns, auf schnelle, intuitive und elegante Weise, Grafiken zu erstellen, und diese in beliebige Formate (PDF, Interaktive Website, Word / Powerpoint) zu exportieren.
+- `R` wird sehr häufig in der Finanzindustrie und in der Statistik verwendet, um Daten schnell und einfach zu analysieren und zu verarbeiten. 
+- Die Syntax ist deren von Python in vieler Hinsicht sehr ähnlich und, je nach Sichtweise, in gewissen Aspekten eleganter (Daten-Analysen, Pipelines, etc.)
+- Die Arbeit in RStudio als IDE ermöglicht es, jederzeit einen kompakten Überblick über Dateien, Variablen, Code, sowie weitere Projektmanagement-Tools wie etwa GitHub zu haben.
 
-Für diese Tutorials verwenden wir die Webseite [in-form-atik.ch:8787](in-form-atik.ch:8787). Speichern Sie diese, sowie Ihren Benutzernamen und Ihr Passwort, an einem sicheren Ort auf Ihrem Computer ab.
+Im Folgenden lernen wir zunächst die grundlegende Syntax, Datentypen sowie grundsätzliche Programmierkenntnisse von R kennen.
+
+## Einrichtung von `R` und `RStudio`
+
+Für diese Tutorials verwenden wir die Webseite [in-form-atik.ch:8787](in-form-atik.ch:8787). Auf dieser Webseite werden wir alle Codes abspeichern und laufen lassen. Speichern Sie diese, sowie Ihren Benutzernamen und Ihr Passwort, an einem sicheren Ort auf Ihrem Computer ab.
 
 Für diese Tutorials verwenden wir `R Markdown` (`.Rmd`-Dateien). Einige Vorteile dieser Skripte sind:
 - Sowohl Code und Erklärtexte können gleichzeitig in separaten Blocks erstellt und angezeigt werden.
@@ -24,7 +39,7 @@ Für diese Tutorials verwenden wir `R Markdown` (`.Rmd`-Dateien). Einige Vorteil
 
 Jeder Code-Block beginnt mit drei Backticks (```) und endet mit drei Backticks. Dazu muss zu beginn noch die Programmiersprache angegeben werden (auch Python ist möglich!). Jeder Code-Block kann mit dem kleinen "Play"-Pfeil oben rechts des Code-Blocks ausgeführt werden.
 
-# Grundlegende mathematische Operationen in R
+## Grundlegende mathematische Operationen in R
 ```{r}
 # Addition
 2 + 2
@@ -38,7 +53,7 @@ Jeder Code-Block beginnt mit drei Backticks (```) und endet mit drei Backticks. 
 
 Ein Befehl wie `print`, den es in Python braucht, muss nicht angegeben werden. Solange nur Werte berechnet, nicht aber abgespeichert werden, werden diese automatisch unterhalb des Code-Blocks ausgegeben.
 
-# Variablen in R
+## Variablen in R
 
 Variablen in R werden mit den Zeichen `<-` gespeichert (in Python würden Sie dafür das `=`-Zeichen verwenden). Falls es Sie interessiert, weshalb dies so ist, finden Sie [hier](https://graebnerc.github.io/RforSocioEcon/basics.html#es:befehle) weitere Erklärungen dazu.
 
@@ -48,7 +63,46 @@ y <- 10
 x + y
 ```
 
-# Arbeiten mit Vektoren
+
+Nebst Zahlen gibt es in R auch Text. Text-Variablen werden typischerweise mit Anführungszeichen geschrieben und gespeichert. Mit dem Befehl `print` kann ein Text ausgegeben werden. 
+
+```{r}
+meinText <- "John Smith"
+print(meinText)
+```
+
+Mit dem Befehl `paste` können mehrere Texte verkettet werden (mit Abstand dazwischen):
+```{r}
+paste("Text1", "Text 2", "Text 3")
+```
+
+
+### Übung
+
+Speichern Sie Ihren Namen in einer Variable `meinName`. Drucken Sie danach auf der Konsole den Text "Hallo `meinName`", wobei der Wert von `meinName` eingesetzt wird. 
+```{r print-paste, exercise=TRUE}
+# fügen Sie Ihren Code hier ein.
+```
+
+```{r print-paste-hint-1}
+meinName <- "..."
+# weiterer Code hier, um den "Hallo meinName" zu drucken!
+```
+
+```{r print-paste-hint-2}
+meinName <- "..."
+print(paste(..., ...))
+```
+```{r print-paste-solution, exercise.reveal_solution = TRUE}
+meinName <- "Cyril Wendl"
+print(paste("Hallo", meinName))
+```
+```{r print-paste-code-check}
+gradethis::grade_code()
+```
+
+
+## Vektoren
 
 Vektoren erlauben es, mehrere Werte in einer Variable abzuspeichern. Sie sind insofern vergleichbar mit Listen in Python.
 
@@ -58,9 +112,51 @@ primzahlen <- c(2, 3, 5, 7, 11)
 primzahlen
 ```
 
+#### Übung
+Erstellen Sie einen Vektor mit den Namen der [5 größten Städte der Schweiz](https://de.wikipedia.org/wiki/Liste_der_Städte_in_der_Schweiz) und geben Sie ihn aus.
 
-# Schleifen in `R`
-Schleifen können in `R` wie folgt erstellt werden:
+```{r vector, exercise=TRUE}
+# fügen Sie Ihren Code untenan ein.
+schweizer_staedte <- ... 
+schweizer_staedte # Resultat ausgeben
+```
+```{r vector-hint}
+schweizer_staedte <- c("...", "...", "...")
+schweizer_staedte # Resultat ausgeben
+```
+```{r vector-solution, exercise.reveal_solution = TRUE}
+schweizer_staedte <- c("Zürich", "Genf", "Basel", "Lausanne", "Bern")
+schweizer_staedte
+```
+```{r vector-code-check}
+gradethis::grade_code()
+```
+
+#### Übung
+Berechnen Sie den Durchschnitt von fünf beliebigen Zahlen in einem Vektor. Verwenden Sie dazu die Funktion `mean(...)`. Speichern Sie den Durchschnitt in einer neuen Variable `durchschnitt` und geben Sie deren Wert aus.
+
+```{r vector2, exercise=TRUE}
+zahlen <- c(8,12,5,33,45)
+# Lösung hier einfügen
+```
+```{r vector2-hint}
+zahlen <- c(8,12,5,33,45)
+durchschnitt = mean(...) # durchschnitt hier berechnen
+# danach durchschnitt ausgeben
+```
+```{r vector2-solution, exercise.reveal_solution = TRUE}
+zahlen <- c(8,12,5,33,45)
+durchschnitt = mean(zahlen)
+durchschnitt
+```
+
+```{r vector2-code-check}
+gradethis::grade_code()
+```
+
+
+## Schleifen in `R`
+Im Code unten nimmt die Variable `primzahl` jeden Wert der Liste `primzahlen` an. In der Schleife wird also jeder Wert zur Summe hinzugefügt.
 
 ```{r}
 # berechne die Summe der ersten 5 Primzahlen
@@ -71,7 +167,34 @@ for (primzahl in primzahlen) {
 summe
 ```
 
-# Verzeigungen
+### Übung 3
+
+Geben Sie für jede Schweizer Stadt aus der vorherigen Übung die Anzahl Zeichen aus. Verwenden Sie dazu die folgenden Funktionen:
+
+- `print`, um einen Text zu drucken
+- `paste` (innerhalb des `print`-Befehls), um zwei Texte miteinander zu verketten (die Stadt und deren Zeichen-Länge)
+- `stringr::str_length` (innerhalb des `paste`-Befehls) zum Berechnen der Anzahl Zeichen in einem Text
+
+
+```{r schleifen, exercise=TRUE}
+# Lösung hier einfügen
+```
+```{r schleifen-hint}
+for(stadt in schweizer_staedte){
+  print(paste(...,...))
+}
+```
+```{r schleifen-solution}
+for(stadt in schweizer_staedte){
+  print(paste(stadt,stringr::str_length(stadt)))
+}
+```
+
+```{r schleifen-code-check}
+gradethis::grade_code()
+```
+
+## Verzeigungen
 
 ```{r}
 # Beispiel für eine einfache Bedingung
@@ -88,7 +211,38 @@ if (punktzahl >= 90) {
 print(ergebnis)
 ```
 
-# Definitionen
+### Übung 4
+Geben Sie für jede Schweizer Stadt aus, ob der Name lang (>= 5 Zeichen) oder kurz ist.
+```{r schleifen-if, exercise=TRUE}
+# Lösung hier einfügen
+```
+```{r schleifen-if-hint}
+for(stadt in schweizer_staedte){
+  if(stringr::str_length(stadt) >= 5){
+    # verwenden Sie hier die Funktionen print und paste
+  }
+  else {
+    # verwenden Sie hier die Funktionen print und paste
+  }
+}
+```
+```{r schleifen-if-solution}
+for(stadt in schweizer_staedte){
+  if(stringr::str_length(stadt) >= 5){
+    print(paste("Langer name", stadt))
+  }
+  else {
+        print(paste("Kurzer name", stadt))
+  }
+}
+```
+
+```{r schleifen-if-code-check}
+gradethis::grade_code()
+```
+
+## Definitionen
+Definitionen erlauben es, kurze Programm-Abläufe für unterschiedliche Variablen-Werte zu definieren. Sie sind somit einem Kochrezept ähnlich, das Beschreibt, wie ein Prozess abläuft, diesen aber nicht konkret ausführt.
 
 ```{r}
 # Definiere eine Funktion, die zwei Zahlen addiert
@@ -103,33 +257,3 @@ print(ergebnis)
 ```
 
 
-# Übungen
-1. Erstellen Sie einen Vektor mit den Namen der [5 größten Städte der Schweiz](https://de.wikipedia.org/wiki/Liste_der_Städte_in_der_Schweiz) und geben Sie ihn aus.
-
-```{r}
-# Lösung hier einfügen
-```
-
-2. *Mathematische Operatoren*: Berechnen Sie den Durchschnitt von fünf beliebigen Zahlen in einem Vektor. Verwenden Sie dazu die Funktion `mean(...)`.
-
-```{r}
-# Lösung hier einfügen
-```
-
-3. *Schleifen*: Geben Sie für jede Schweizer Stadt aus Übung 1 die Anzahl Zeichen aus. Verwenden Sie dazu die Funktion `stringr::str_length("...")`
-```{r}
-# Lösung hier einfügen
-```
-
-4. *Verzweigungen*: Geben Sie für jede schweizer Stadt aus, ob der Name lang (>= 5 Zeichen) oder kurz ist.
-```{r}
-# Lösung hier einfügen
-```
-
-# Challenge-Übungen
-Verwenden Sie den Leistungsdatensatz (`SwissStudentPerformance.csv`), um den Durchschnitt und Median der Mathematiknoten von Schülern aus verschiedenen Regionen der Schweiz zu berechnen. Funktionen, die Sie verwenden sollten:
-- `read.csv`
-- Funktionen der Bibliothek `dplyr` (suchen Sie mit Google danach!)
-```{r}
-# Lösung hier einfügen
-```

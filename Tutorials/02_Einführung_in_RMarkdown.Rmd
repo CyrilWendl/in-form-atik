@@ -1,6 +1,12 @@
 ---
-title: "Einführung in R Markdown"
-output: html_document
+title: "Lektion 02: Einführung in R Markdown"
+author: "Cyril Wendl"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
 ---
 
 ## Einführung in R Markdown
@@ -14,9 +20,12 @@ R Markdown ist ein nützliches Werkzeug, mit dem Sie Code, Text und Grafiken in 
 ### Struktur eines R Markdown Dokuments
 
 Ein R-Markdown-Dokument besteht aus:
+
 - **Header** (wie der Titel und die Ausgabeoptionen oben),
 - **Text**, 
 - **Code-Chunks**.
+
+Jeder Code-Chunk beginnt mit drei "Backticks" und der weiteren Angaben `{r}`
 
 ### Einfache Beispiele
 
