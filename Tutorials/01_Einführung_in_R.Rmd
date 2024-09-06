@@ -3,12 +3,10 @@ title: "Lektion 01: Einführung in R"
 author: "Cyril Wendl"
 date: "`r Sys.Date()`"
 output:
-  html_document:
-    toc: true
-    toc_float:
-      collapsed: true
   learnr::tutorial:
+    language: de
     progressive: true
+    allow_skip: false
 runtime: shiny_prerendered
 ---
 
@@ -21,6 +19,7 @@ schweizer_staedte <- c("Zürich", "Genf", "Basel", "Lausanne", "Bern")
 ## Einführung in `R`
 
 In dieser Lektion lernen Sie die Grundlagen der Programmierung mit der Sprache `R`. Einige der grossen Vorteile der Programmiersprache `R` sind: 
+
 - `R` erlaubt es uns, auf schnelle, intuitive und elegante Weise, Grafiken zu erstellen, und diese in beliebige Formate (PDF, Interaktive Website, Word / Powerpoint) zu exportieren.
 - `R` wird sehr häufig in der Finanzindustrie und in der Statistik verwendet, um Daten schnell und einfach zu analysieren und zu verarbeiten. 
 - Die Syntax ist deren von Python in vieler Hinsicht sehr ähnlich und, je nach Sichtweise, in gewissen Aspekten eleganter (Daten-Analysen, Pipelines, etc.)

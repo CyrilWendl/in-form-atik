@@ -26,7 +26,24 @@ Jeder Code-Block beginnt mit drei Backticks (```) und endet mit drei Backticks. 
 
 # Grundlegende mathematische Operationen in R
 ```{r}
-install.packages("TurtleGraphics")
+# install.packages("TurtleGraphics")
+```
+
+```{r}
+turtle_brownian <- function(steps=100, length=10) {
+   turtle_lwd(2)
+   angles <- sample(c(90,270,180,0), steps,replace=TRUE)
+   coll <- sample(1:657, steps, replace=TRUE)
+   for (i in 1:steps){
+      turtle_left(angles[i])
+      turtle_col(colors()[coll[i]])
+      turtle_forward(length)
+   }
+}
+
+set.seed(124)
+turtle_init(800, 800, mode="clip")
+turtle_do(turtle_brownian(1000, length=25))
 ```
 
 Ein Befehl wie `print`, den es in Python braucht, muss nicht angegeben werden. Solange nur Werte berechnet, nicht aber abgespeichert werden, werden diese automatisch unterhalb des Code-Blocks ausgegeben.

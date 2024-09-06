@@ -3,11 +3,17 @@ title: "Lektion 02: Einführung in R Markdown"
 author: "Cyril Wendl"
 date: "`r Sys.Date()`"
 output:
-  html_document:
-    toc: true
-    toc_float:
-      collapsed: true
+  learnr::tutorial:
+    language: de
+    progressive: true
+    allow_skip: false
+runtime: shiny_prerendered
 ---
+
+```{r setup, include=FALSE}
+library(learnr)
+gradethis::gradethis_setup()
+```
 
 ## Einführung in R Markdown
 
